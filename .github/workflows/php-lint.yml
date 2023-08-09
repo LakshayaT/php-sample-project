@@ -31,7 +31,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Install PHP extensions
-      run: apt install php-ast
+      run: pecl install ast
 
     - name: Run code quality checks
       run: composer lint
