@@ -5,39 +5,33 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-versions: ['8.1']
     steps:
     - name: Checkout app
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Install PHP dependencies
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-versions }}
-        tools: pecl
-        extensions: ast
-
-    - name: Get Composer cache directory
+    - name: Cache Composer packages
       id: composer-cache
-      run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-    - name: Check Composer cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
 
     - name: Update dependencies
       run: composer update
 
     - name: Install dependencies
-      run: composer install
+      run: composer install --prefer-dist --no-progress
 
     - name: Run code quality checks
       run: composer lint
+
+    - name: Run code analysis checks
+      run: composer phan
