@@ -27,7 +27,8 @@ return [
 
     'directory_list' => [
         'public',
-        'src'
+        'src',
+        'vendor/symfony'
     ],
 
     // A directory list that defines files that will be excluded
